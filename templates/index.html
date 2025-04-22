@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <section id="showcase">
+        <div class="container">
+            <h1>Find Your Dream Job Today</h1>
+            <p>Join thousands of companies and job seekers using our platform</p>
+            <a href="{{ url_for('all_jobs') }}" class="btn">Browse Jobs</a>
+        </div>
+    </section>
+
+    <section id="featured-jobs">
+        <h2>Featured Jobs</h2>
+        <div class="job-list">
+            {% for job in featured_jobs %}
+                <div class="job-card">
+                    <h3>{{ job.title }}</h3>
+                    <p class="company">{{ job.company }}</p>
+                    <p class="location"><i class="fas fa-map-marker-alt"></i> {{ job.location }}</p>
+                    <p class="salary">${{ "%.2f"|format(job.salary) }}/year</p>
+                    <a href="{{ url_for('apply_job', job_id=job.id) }}" class="btn">Apply Now</a>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section id="how-it-works">
+        <h2>How It Works</h2>
+        <div class="steps">
+            <div class="step">
+                <i class="fas fa-user-tie"></i>
+                <h3>For Employers</h3>
+                <p>Post your job openings and find qualified candidates quickly.</p>
+            </div>
+            <div class="step">
+                <i class="fas fa-search"></i>
+                <h3>For Job Seekers</h3>
+                <p>Search and apply for jobs that match your skills and interests.</p>
+            </div>
+            <div class="step">
+                <i class="fas fa-handshake"></i>
+                <h3>Get Hired</h3>
+                <p>Connect with employers and start your new career journey.</p>
+            </div>
+        </div>
+    </section>
+{% endblock %}

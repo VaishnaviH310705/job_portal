@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for Job{% endblock %}
+
+{% block content %}
+    <section class="apply-job">
+        <h2>Apply for: {{ job.title }}</h2>
+        <div class="job-details">
+            <h3>{{ job.company }}</h3>
+            <p><i class="fas fa-map-marker-alt"></i> {{ job.location }}</p>
+            <p><strong>Salary:</strong> ${{ "%.2f"|format(job.salary) }}/year</p>
+            <p><strong>Description:</strong> {{ job.description }}</p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('apply_job', job_id=job.id) }}">
+            <p>You're applying as: {{ session['name'] }}</p>
+            <button type="submit" class="btn">Submit Application</button>
+            <a href="{{ url_for('all_jobs') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </section>
+{% endblock %}

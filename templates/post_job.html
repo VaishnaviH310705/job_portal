@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Post a Job{% endblock %}
+
+{% block content %}
+    <section class="job-form">
+        <h2>Post a New Job</h2>
+        <form method="POST" action="{{ url_for('post_job') }}">
+            <div class="form-group">
+                <label for="title">Job Title:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="company">Company:</label>
+                <input type="text" id="company" name="company" required>
+            </div>
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <input type="text" id="location" name="location" required>
+            </div>
+            <div class="form-group">
+                <label for="salary">Salary ($/year):</label>
+                <input type="number" id="salary" name="salary" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Job Description:</label>
+                <textarea id="description" name="description" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn">Post Job</button>
+        </form>
+    </section>
+{% endblock %}

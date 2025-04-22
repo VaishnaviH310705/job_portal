@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <section id="dashboard">
+        <h2>Welcome, {{ session['name'] }}!</h2>
+        
+        {% if role == 'admin' %}
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>Total Users</h3>
+                    <p>{{ total_users }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Jobs</h3>
+                    <p>{{ total_jobs }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Applications</h3>
+                    <p>{{ total_applications }}</p>
+                </div>
+            </div>
+            
+            <div class="dashboard-section">
+                <h3>Recent Job Postings</h3>
+                <div class="job-list">
+                    {% for job in recent_jobs %}
+                        <div class="job-card">
+                            <h4>{{ job.title }}</h4>
+                            <p class="company">{{ job.company }}</p>
+                            <p class="location"><i class="fas fa-map-marker-alt"></i> {{ job.location }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="dashboard-section">
+                <h3>Recent Applications</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Job Title</th>
+                            <th>Applicant</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in recent_applications %}
+                            <tr>
+                                <td>{{ app.job_title }}</td>
+                                <td>{{ app.user_name }}</td>
+                                <td>{{ app.application_date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ app.status }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+        {% elif role == 'employer' %}
+            <div class="dashboard-section">
+                <h3>Your Job Postings</h3>
+                {% if jobs %}
+                    <div class="job-list">
+                        {% for job in jobs %}
+                            <div class="job-card">
+                                <h4>{{ job.title }}</h4>
+                                <p class="company">{{ job.company }}</p>
+                                <p class="location"><i class="fas fa-map-marker-alt"></i> {{ job.location }}</p>
+                                <a href="{{ url_for('all_jobs') }}" class="btn">View Details</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>You haven't posted any jobs yet.</p>
+                    <a href="{{ url_for('post_job') }}" class="btn">Post a Job</a>
+                {% endif %}
+            </div>
+            
+            <div class="dashboard-section">
+                <h3>Applications for Your Jobs</h3>
+                {% if applications %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Job Title</th>
+                                <th>Applicant</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in applications %}
+                                <tr>
+                                    <td>{{ app.job_title }}</td>
+                                    <td>{{ app.applicant_name }}</td>
+                                    <td>{{ app.application_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ app.status }}</td>
+                                    <td>
+                                        {% if app.status == 'pending' %}
+                                            <a href="{{ url_for('update_application_status', app_id=app.id, status='accepted') }}" class="btn btn-small btn-success">Accept</a>
+                                            <a href="{{ url_for('update_application_status', app_id=app.id, status='rejected') }}" class="btn btn-small btn-danger">Reject</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No applications yet.</p>
+                {% endif %}
+            </div>
+            
+        {% else %}  <!-- job_seeker -->
+            <div class="dashboard-section">
+                <h3>Your Applications</h3>
+                {% if applications %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Job Title</th>
+                                <th>Company</th>
+                                <th>Location</th>
+                                <th>Applied On</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in applications %}
+                                <tr>
+                                    <td>{{ app.title }}</td>
+                                    <td>{{ app.company }}</td>
+                                    <td>{{ app.location }}</td>
+                                    <td>{{ app.application_date.strftime('%Y-%m-%d') }}</td>
+                                    <td class="status-{{ app.status }}">{{ app.status|title }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>You haven't applied to any jobs yet.</p>
+                    <a href="{{ url_for('all_jobs') }}" class="btn">Browse Jobs</a>
+                {% endif %}
+            </div>
+            
+            <div class="dashboard-section">
+                <h3>Recommended Jobs</h3>
+                <div class="job-list">
+                    {% for job in recommended_jobs %}
+                        <div class="job-card">
+                            <h4>{{ job.title }}</h4>
+                            <p class="company">{{ job.company }}</p>
+                            <p class="location"><i class="fas fa-map-marker-alt"></i> {{ job.location }}</p>
+                            <a href="{{ url_for('apply_job', job_id=job.id) }}" class="btn">Apply Now</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}
