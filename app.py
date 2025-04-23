@@ -1,15 +1,32 @@
+import os
+import time
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import mysql.connector
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = 'A2d@5!kL9$qW7#pZ*eR8&gY6'
+
+# File upload configuration
+UPLOAD_FOLDER = 'static/uploads/resumes'
+ALLOWED_EXTENSIONS = {'pdf'}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
+
+# Ensure upload folder exists
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Database configuration
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'Vaish@2005',  # Add your MySQL password here
-    'database': 'job_portal'
+    'password': '123venkatesh',  # Add your MySQL password here
+    'database': 'job_portal11'
 }
 
 def get_db_connection():
@@ -100,13 +117,52 @@ def all_jobs():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
-    cursor.execute("SELECT * FROM jobs ORDER BY post_date DESC")
+    # Get filter parameters from query string
+    min_salary = request.args.get('min_salary', type=float)
+    max_salary = request.args.get('max_salary', type=float)
+    location = request.args.get('location', '').strip()
+    keywords = request.args.get('keywords', '').strip()
+    
+    # Base query
+    query = "SELECT * FROM jobs"
+    conditions = []
+    params = []
+    
+    # Build filter conditions
+    if min_salary is not None:
+        conditions.append("salary >= %s")
+        params.append(min_salary)
+    if max_salary is not None:
+        conditions.append("salary <= %s")
+        params.append(max_salary)
+    if location:
+        conditions.append("location LIKE %s")
+        params.append(f"%{location}%")
+    if keywords:
+        conditions.append("(title LIKE %s OR description LIKE %s)")
+        params.extend([f"%{keywords}%", f"%{keywords}%"])
+    
+    # Combine conditions
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+    
+    # Order by post_date
+    query += " ORDER BY post_date DESC"
+    
+    # Execute query
+    cursor.execute(query, params)
     jobs = cursor.fetchall()
     
     cursor.close()
     conn.close()
     
-    return render_template('jobs.html', jobs=jobs)
+    # Pass filter values back to template to persist in form
+    return render_template('jobs.html', jobs=jobs, filters={
+        'min_salary': min_salary or '',
+        'max_salary': max_salary or '',
+        'location': location,
+        'keywords': keywords
+    })
 
 @app.route('/post_job', methods=['GET', 'POST'])
 def post_job():
@@ -152,27 +208,74 @@ def apply_job(job_id):
     existing_application = cursor.fetchone()
     
     if existing_application:
+        cursor.close()
+        conn.close()
         flash('You have already applied for this job', 'warning')
         return redirect(url_for('all_jobs'))
-    
-    if request.method == 'POST':
-        cursor.execute(
-            "INSERT INTO applications (job_id, user_id) VALUES (%s, %s)",
-            (job_id, session['user_id'])
-        )
-        conn.commit()
-        
-        flash('Application submitted successfully!', 'success')
-        return redirect(url_for('job_seeker_dashboard'))
     
     # Get job details
     cursor.execute("SELECT * FROM jobs WHERE id = %s", (job_id,))
     job = cursor.fetchone()
     
+    if not job:
+        cursor.close()
+        conn.close()
+        flash('Job not found', 'danger')
+        return redirect(url_for('all_jobs'))
+    
+    if request.method == 'POST':
+        cover_letter = request.form.get('cover_letter')
+        years_experience = request.form.get('years_experience')
+        skills = request.form.get('skills')
+        resume = request.files.get('resume')
+        
+        # Validate form fields
+        errors = []
+        if not cover_letter or len(cover_letter.strip()) < 10:
+            errors.append('Cover letter must be at least 10 characters.')
+        if not years_experience or not years_experience.isdigit() or int(years_experience) < 0:
+            errors.append('Years of experience must be a non-negative number.')
+        if not skills or len(skills.strip()) < 3:
+            errors.append('Skills must be at least 3 characters.')
+        if not resume or not allowed_file(resume.filename):
+            errors.append('A valid PDF resume is required.')
+        
+        if errors:
+            cursor.close()
+            conn.close()
+            for error in errors:
+                flash(error, 'danger')
+            # Persist form data in template
+            return render_template('apply.html', job=job, form_data={
+                'cover_letter': cover_letter,
+                'years_experience': years_experience,
+                'skills': skills
+            })
+        
+        # Save resume file
+        filename = secure_filename(resume.filename)
+        unique_filename = f"{session['user_id']}_{job_id}_{int(time.time())}_{filename}"
+        resume_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+        resume.save(resume_path)
+        
+        # Insert application into database
+        cursor.execute(
+            """INSERT INTO applications (job_id, user_id, cover_letter, years_experience, skills, resume_path)
+               VALUES (%s, %s, %s, %s, %s, %s)""",
+            (job_id, session['user_id'], cover_letter, int(years_experience), skills, resume_path)
+        )
+        conn.commit()
+        
+        cursor.close()
+        conn.close()
+        
+        flash('Application submitted successfully!', 'success')
+        return redirect(url_for('job_seeker_dashboard'))
+    
     cursor.close()
     conn.close()
     
-    return render_template('apply.html', job=job)
+    return render_template('apply.html', job=job, form_data={})
 
 @app.route('/admin/dashboard')
 def admin_dashboard():
