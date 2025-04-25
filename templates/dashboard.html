@@ -147,17 +147,40 @@
             </div>
             
             <div class="dashboard-section">
-                <h3>Recommended Jobs</h3>
-                <div class="job-list">
-                    {% for job in recommended_jobs %}
-                        <div class="job-card">
-                            <h4>{{ job.title }}</h4>
-                            <p class="company">{{ job.company }}</p>
-                            <p class="location"><i class="fas fa-map-marker-alt"></i> {{ job.location }}</p>
-                            <a href="{{ url_for('apply_job', job_id=job.id) }}" class="btn">Apply Now</a>
-                        </div>
-                    {% endfor %}
-                </div>
+                <h3>Recommended Jobs Based on Your Skills</h3>
+                {% if recommended_jobs %}
+                    <div class="job-list">
+                        {% for job in recommended_jobs %}
+                            <div class="job-card">
+                                <h4>{{ job.title }}</h4>
+                                <p class="company">{{ job.company }}</p>
+                                <p class="location"><i class="fas fa-map-marker-alt"></i> {{ job.location }}</p>
+                                <a href="{{ url_for('apply_job', job_id=job.id) }}" class="btn">Apply Now</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No recommendations available. Update your <a href="{{ url_for('profile') }}">profile</a> with skills to get recommendations.</p>
+                {% endif %}
+            </div>
+            
+            <div class="dashboard-section">
+                <h3>Jobs Matching Your Alerts</h3>
+                {% if matching_jobs %}
+                    <div class="job-list">
+                        {% for job in matching_jobs %}
+                            <div class="job-card">
+                                <h4>{{ job.title }}</h4>
+                                <p class="company">{{ job.company }}</p>
+                                <p class="location"><i class="fas fa-map-marker-alt"></i> {{ job.location }}</p>
+                                <a href="{{ url_for('apply_job', job_id=job.id) }}" class="btn">Apply Now</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No jobs match your alerts. <a href="{{ url_for('alerts') }}">Create alerts</a> to get notified.</p>
+                {% endif %}
+                <a href="{{ url_for('alerts') }}" class="btn">Manage Job Alerts</a>
             </div>
         {% endif %}
     </section>

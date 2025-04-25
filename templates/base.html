@@ -19,6 +19,7 @@
                     <li><a href="{{ url_for('home') }}" aria-current="{% if request.endpoint == 'home' %}page{% endif %}">Home</a></li>
                     <li><a href="{{ url_for('all_jobs') }}" aria-current="{% if request.endpoint == 'all_jobs' %}page{% endif %}">Browse Jobs</a></li>
                     {% if 'user_id' in session %}
+                        <li><a href="{{ url_for('profile') }}" aria-current="{% if request.endpoint == 'profile' %}page{% endif %}">Profile</a></li>
                         <li><a href="{{ url_for(session['role'] + '_dashboard') }}" aria-current="{% if request.endpoint == session['role'] + '_dashboard' %}page{% endif %}">Dashboard</a></li>
                         <li><a href="{{ url_for('logout') }}">Logout ({{ session['name'] }})</a></li>
                     {% else %}
@@ -46,7 +47,7 @@
 
     <footer aria-label="Footer">
         <div class="container">
-            <p>JobPortal &copy; 2025 - Project</p>
+            <p>JobPortal © 2025 - Project</p>
         </div>
     </footer>
 </body>

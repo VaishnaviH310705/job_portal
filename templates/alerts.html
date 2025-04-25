@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Job Alerts{% endblock %}
+
+{% block content %}
+    <section class="auth-form rounded-lg" aria-label="Job alerts form">
+        <h2 class="text-center">Manage Job Alerts</h2>
+        <form method="POST" action="{{ url_for('alerts') }}">
+            <div class="form-group">
+                <label for="keywords">Keywords</label>
+                <input type="text" id="keywords" name="keywords" placeholder="e.g., Software Engineer, Data Analyst">
+            </div>
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" placeholder="e.g., New York, Remote">
+            </div>
+            <div class="form-group">
+                <label for="min_salary">Minimum Salary ($/year)</label>
+                <input type="number" id="min_salary" name="min_salary" step="0.01" placeholder="e.g., 50000">
+            </div>
+            <div class="form-group">
+                <label for="max_salary">Maximum Salary ($/year)</label>
+                <input type="number" id="max_salary" name="max_salary" step="0.01" placeholder="e.g., 100000">
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn" aria-label="Create job alert">Create Alert</button>
+            </div>
+        </form>
+
+        <div class="dashboard-section mt-4">
+            <h3>Your Job Alerts</h3>
+            {% if alerts %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Keywords</th>
+                            <th>Location</th>
+                            <th>Salary Range</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alert in alerts %}
+                            <tr>
+                                <td>{{ alert.keywords or 'Any' }}</td>
+                                <td>{{ alert.location or 'Any' }}</td>
+                                <td>{{ alert.min_salary|float|round(2)|string if alert.min_salary else 'No min' }} - {{ alert.max_salary|float|round(2)|string if alert.max_salary else 'No max' }}</td>
+                                <td>{{ alert.created_at.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>You have no job alerts set up.</p>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

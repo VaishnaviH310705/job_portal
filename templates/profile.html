@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+    <section class="auth-form rounded-lg" aria-label="User profile form">
+        <h2 class="text-center">Manage Your Profile</h2>
+        <form method="POST" action="{{ url_for('profile') }}" enctype="multipart/form-data">
+            {% if role == 'job_seeker' %}
+                <div class="form-group">
+                    <label for="skills">Skills (comma-separated)</label>
+                    <input type="text" id="skills" name="skills" value="{{ profile_data.skills or '' }}" placeholder="e.g., Python, JavaScript, SQL">
+                </div>
+                <div class="form-group">
+                    <label for="work_experience">Work Experience</label>
+                    <textarea id="work_experience" name="work_experience" rows="6">{{ profile_data.work_experience or '' }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="education">Education</label>
+                    <textarea id="education" name="education" rows="4">{{ profile_data.education or '' }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="certificates">Certificates (PDF files)</label>
+                    <input type="file" id="certificates" name="certificates" accept=".pdf" multiple>
+                    <p class="help-text">Upload one or more PDF certificates (max 5MB each).</p>
+                </div>
+                {% if certificates %}
+                    <div class="form-group">
+                        <label>Existing Certificates</label>
+                        <ul class="certificate-list">
+                            {% for cert in certificates %}
+                                <li>
+                                    <a href="{{ url_for('static', filename=cert.file_path|replace('static/', '')) }}" target="_blank">
+                                        {{ cert.file_path|basename }} (Uploaded: {{ cert.uploaded_at.strftime('%Y-%m-%d %H:%M:%S') }})
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            {% elif role == 'employer' %}
+                <div class="form-group">
+                    <label for="company_name">Company Name</label>
+                    <input type="text" id="company_name" name="company_name" value="{{ profile_data.company_name or '' }}" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="company_description">Company Description</label>
+                    <textarea id="company_description" name="company_description" rows="6">{{ profile_data.company_description or '' }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="website">Company Website</label>
+                    <input type="url" id="website" name="website" value="{{ profile_data.website or '' }}" placeholder="https://example.com">
+                </div>
+            {% endif %}
+            <div class="text-center">
+                <button type="submit" class="btn" aria-label="Save profile">Save Profile</button>
+            </div>
+        </form>
+    </section>
+{% endblock %}
