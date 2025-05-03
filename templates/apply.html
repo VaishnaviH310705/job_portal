@@ -3,19 +3,37 @@
 {% block title %}Apply for Job{% endblock %}
 
 {% block content %}
-    <section class="apply-job">
-        <h2>Apply for: {{ job.title }}</h2>
+    <section class="apply-job job-form rounded-lg" aria-label="Job application form">
+        <h2 class="text-center">Apply for: {{ job.title }}</h2>
         <div class="job-details">
-            <h3>{{ job.company }}</h3>
-            <p><i class="fas fa-map-marker-alt"></i> {{ job.location }}</p>
+            <h3 class="text-gradient">{{ job.company }}</h3>
+            <p><i class="fas fa-map-marker-alt" aria-hidden="true"></i> {{ job.location }}</p>
             <p><strong>Salary:</strong> ${{ "%.2f"|format(job.salary) }}/year</p>
             <p><strong>Description:</strong> {{ job.description }}</p>
         </div>
         
-        <form method="POST" action="{{ url_for('apply_job', job_id=job.id) }}">
-            <p>You're applying as: {{ session['name'] }}</p>
-            <button type="submit" class="btn">Submit Application</button>
-            <a href="{{ url_for('all_jobs') }}" class="btn btn-secondary">Cancel</a>
+        <form method="POST" action="{{ url_for('apply_job', job_id=job.id) }}" enctype="multipart/form-data">
+            <p class="text-center">You're applying as: {{ session['name'] }}</p>
+            <div class="form-group">
+                <label for="cover_letter">Cover Letter</label>
+                <textarea id="cover_letter" name="cover_letter" rows="6" required aria-required="true">{{ form_data.cover_letter }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="years_experience">Years of Experience</label>
+                <input type="number" id="years_experience" name="years_experience" min="0" value="{{ form_data.years_experience }}" required aria-required="true">
+            </div>
+            <div class="form-group">
+                <label for="skills">Skills (comma-separated)</label>
+                <input type="text" id="skills" name="skills" value="{{ form_data.skills }}" placeholder="e.g., Python, JavaScript" required aria-required="true">
+            </div>
+            <div class="form-group">
+                <label for="resume">Upload Resume (PDF only, max 5MB)</label>
+                <input type="file" id="resume" name="resume" accept=".pdf" required aria-required="true">
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn" aria-label="Submit application">Submit Application</button>
+                <a href="{{ url_for('all_jobs') }}" class="btn btn-secondary" aria-label="Cancel application">Cancel</a>
+            </div>
         </form>
     </section>
 {% endblock %}

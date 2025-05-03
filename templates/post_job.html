@@ -3,30 +3,32 @@
 {% block title %}Post a Job{% endblock %}
 
 {% block content %}
-    <section class="job-form">
-        <h2>Post a New Job</h2>
+    <section class="job-form rounded-lg" aria-label="Post a job form">
+        <h2 class="text-center">Post a New Job</h2>
         <form method="POST" action="{{ url_for('post_job') }}">
             <div class="form-group">
-                <label for="title">Job Title:</label>
-                <input type="text" id="title" name="title" required>
+                <label for="title">Job Title</label>
+                <input type="text" id="title" name="title" required aria-required="true">
             </div>
             <div class="form-group">
-                <label for="company">Company:</label>
-                <input type="text" id="company" name="company" required>
+                <label for="company">Company</label>
+                <input type="text" id="company" name="company" required aria-required="true">
             </div>
             <div class="form-group">
-                <label for="location">Location:</label>
-                <input type="text" id="location" name="location" required>
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" required aria-required="true">
             </div>
             <div class="form-group">
-                <label for="salary">Salary ($/year):</label>
-                <input type="number" id="salary" name="salary" step="0.01" required>
+                <label for="salary">Salary ($/year)</label>
+                <input type="number" id="salary" name="salary" step="0.01" min="0" required aria-required="true">
             </div>
             <div class="form-group">
-                <label for="description">Job Description:</label>
-                <textarea id="description" name="description" rows="5" required></textarea>
+                <label for="description">Job Description</label>
+                <textarea id="description" name="description" rows="6" required aria-required="true"></textarea>
             </div>
-            <button type="submit" class="btn">Post Job</button>
+            <div class="text-center">
+                <button type="submit" class="btn" aria-label="Post job">Post Job</button>
+            </div>
         </form>
     </section>
 {% endblock %}

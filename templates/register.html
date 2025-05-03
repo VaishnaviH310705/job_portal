@@ -3,34 +3,37 @@
 {% block title %}Register{% endblock %}
 
 {% block content %}
-    <section class="auth-form">
-        <h2>Create an Account</h2>
+    <section class="auth-form rounded-lg" aria-label="Registration form">
+        <h2 class="text-center">Create Your Account</h2>
         <form method="POST" action="{{ url_for('register') }}">
             <div class="form-group">
-                <label for="name">Full Name:</label>
-                <input type="text" id="name" name="name" required>
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required aria-required="true">
             </div>
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required aria-required="true">
             </div>
             <div class="form-group">
-                <label for="phone">Phone:</label>
-                <input type="tel" id="phone" name="phone">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone" aria-describedby="phone-help">
+                <small id="phone-help" class="form-text">Optional</small>
             </div>
             <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required aria-required="true">
             </div>
             <div class="form-group">
-                <label for="role">I am a:</label>
-                <select id="role" name="role" required>
+                <label for="role">I am a</label>
+                <select id="role" name="role" required aria-required="true">
                     <option value="job_seeker">Job Seeker</option>
                     <option value="employer">Employer</option>
                 </select>
             </div>
-            <button type="submit" class="btn">Register</button>
+            <div class="text-center">
+                <button type="submit" class="btn" aria-label="Register">Register</button>
+            </div>
         </form>
-        <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+        <p class="text-center mt-2">Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
     </section>
 {% endblock %}
